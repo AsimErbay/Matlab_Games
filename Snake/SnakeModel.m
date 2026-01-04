@@ -1,17 +1,16 @@
 
 classdef SnakeModel < handle
-    %SNAKEMODEL Grid tabanlı Snake oyunu mantık sınıfı.
-    %   Grid koordinatları 1-tabanlıdır. head ilk satırdır.
+
     
     properties (Access = private)
         nRows
         nCols
-        snake      % Nx2 [row col], head = snake(1,:)
+        snake      
         dir        % [dRow dCol], örn: [0 1] sağ
         food       % [row col]
         alive
         score
-        wrapWalls  % true ise duvarlardan sarar, false ise çarpışma
+        wrapWalls  
     end
     
     methods
@@ -63,16 +62,12 @@ classdef SnakeModel < handle
         end
         
         function event = step(obj)
-            % Bir tik ilerle: yediyse büyür, yoksa hareket eder.
-            % Çıkış event: struct with fields:
-            %   .ateFood (logical), .gameOver (logical)
             event = struct('ateFood',false,'gameOver',false);
             if ~obj.alive, event.gameOver = true; return; end
             
             head = obj.snake(1,:);
             next = head + obj.dir;
             
-            % Duvar kontrol / wrap
             if obj.wrapWalls
                 if next(1) < 1, next(1) = obj.nRows; end
                 if next(1) > obj.nRows, next(1) = 1; end
@@ -84,20 +79,17 @@ classdef SnakeModel < handle
                 end
             end
             
-            % Kendi gövdesine çarpışma (kuyruğun hareket edeceğini unutma)
-            body = obj.snake(1:end-1,:); % kuyruğu şimdilik hariç tut
+            body = obj.snake(1:end-1,:); 
             if any(all(bsxfun(@eq, body, next), 2))
                 obj.alive = false; event.gameOver = true; return;
             end
-            
-            % Yem yeme
             if next(1) == obj.food(1) && next(2) == obj.food(2)
-                obj.snake = [next; obj.snake]; % büyü
+                obj.snake = [next; obj.snake]; 
                 obj.score = obj.score + 1;
                 event.ateFood = true;
                 obj.placeFood();
             else
-                % Sıradan hareket (baş ekle, kuyruk düşür)
+                
                 obj.snake = [next; obj.snake(1:end-1,:)];
             end
         end
@@ -117,7 +109,6 @@ classdef SnakeModel < handle
     
     methods (Access = private)
         function placeFood(obj)
-            % Boş hücrelerden rasgele seç
             occ = false(obj.nRows, obj.nCols);
             if ~isempty(obj.snake)
                 idx = obj.snake(:,1) + (obj.snake(:,2)-1)*obj.nRows;
@@ -125,7 +116,6 @@ classdef SnakeModel < handle
             end
             emptyIdx = find(~occ);
             if isempty(emptyIdx)
-                % Tüm grid dolu → kazanım: alive=false ama özel durum
                 obj.alive = false;
                 return;
             end

@@ -222,7 +222,6 @@ classdef SnakeGameApp < handle
         end
         
         function onWrapChanged(obj)
-            % Wrap değişince oyunu sıfırlamak daha temiz
             gs = obj.model.getGridSize();
             wrap = obj.wrapCheck.Value;
             wasRunning = ~obj.paused;
